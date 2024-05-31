@@ -1,0 +1,141 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
+struct Place {
+    int id;
+    std::string name;
+    std::string type;
+    int popularity;
+    double score;
+};
+
+// 枚举类型，用于指定排序的字段
+enum class SortField {
+    Popularity,
+    Score
+};
+
+// 函数原型
+bool readPlacesFromFile(const std::string& filename, Place places[], int& placeCount, int maxPlaces);
+void printPlaces(const Place places[], int placeCount);
+void swap(Place* a, Place* b);
+int partition(Place arr[], int low, int high, SortField sortField);
+void quickSort(Place arr[], int low, int high, SortField sortField);
+
+// 交换两个Place对象
+void swap(Place* a, Place* b) {
+    Place t = *a;
+    *a = *b;
+    *b = t;
+}
+
+// 选择基准并进行分区的函数实现
+int partition(Place arr[], int low, int high, SortField sortField) {
+    Place pivot = arr[high];    // 选择最后一个元素作为基准
+    int i = (low - 1);  // 小于基准的元素的索引
+
+    for (int j = low; j <= high - 1; j++) {
+        // 根据sortField的值来比较元素
+        if ((sortField == SortField::Popularity && arr[j].popularity > pivot.popularity) ||
+            (sortField == SortField::Score && arr[j].score > pivot.score)) {
+            i++;    // 增加小于基准的元素的索引
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+// 快速排序函数的实现
+void quickSort(Place arr[], int low, int high, SortField sortField) {
+    if (low < high) {
+        // pi是分区索引，arr[pi]现在位于正确的位置
+        int pi = partition(arr, low, high, sortField);
+        // 分别对基准元素左侧和右侧的子数组进行递归排序
+        quickSort(arr, low, pi - 1, sortField);
+        quickSort(arr, pi + 1, high, sortField);
+    }
+}
+
+// 从文件中读取地点数据
+bool readPlacesFromFile(const std::string& filename, Place places[], int& placeCount, int maxPlaces) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cout << "无法打开文件" << std::endl;
+        return false;
+    }
+
+    std::string line;
+    getline(file, line); // 读取并丢弃标题行
+
+    while (getline(file, line) && placeCount < maxPlaces) {
+        std::stringstream ss(line);
+        Place& place = places[placeCount];
+
+        std::string field;
+        getline(ss, field, ',');
+        place.id = std::stoi(field);
+
+        getline(ss, place.name, ',');
+        getline(ss, place.type, ',');
+
+        getline(ss, field, ',');
+        place.popularity = std::stoi(field);
+
+        getline(ss, field, ',');
+        place.score = std::stod(field);
+
+        placeCount++;
+    }
+
+    if (!file.eof()) {
+        std::cout << "在读取文件时出现错误" << std::endl;
+        return false;
+    }
+
+    file.close();
+    return true;
+}
+
+// 打印地点数据
+void printPlaces(const Place places[], int placeCount) {
+    for (int i = 0; i < placeCount; i++) {
+        const Place& place = places[i];
+        std::cout << "ID: " << place.id << ", Name: " << place.name << ", Type: " << place.type
+            << ", Popularity: " << place.popularity << ", Score: " << place.score << std::endl;
+    }
+}
+
+int main() {
+    const int MAX_PLACES = 1000; // 假设最多读取1000个地点
+    Place places[MAX_PLACES];
+    int placeCount = 0;
+
+    std::string filename = "places.csv"; // 假设数据存储在places.csv文件中
+
+    // 从文件中读取地点数据
+    if (readPlacesFromFile(filename, places, placeCount, MAX_PLACES)) {
+        std::cout << "成功读取 " << placeCount << " 个地点数据。" << std::endl;
+
+        // 使用popularity字段对地点数据进行快速排序
+        quickSort(places, 0, placeCount - 1, SortField::Popularity); // 按照popularity降序排列
+
+        // 打印排序后的地点数据
+        std::cout << "按照popularity降序排列的地点数据：" << std::endl;
+        printPlaces(places, placeCount);
+
+        // 使用score字段对地点数据进行快速排序
+        quickSort(places, 0, placeCount - 1, SortField::Score); // 按照score降序排列
+
+        // 打印排序后的地点数据
+        std::cout << "按照score降序排列的地点数据：" << std::endl;
+        printPlaces(places, placeCount);
+    }
+    else {
+        std::cout << "读取文件失败。" << std::endl;
+    }
+
+    return 0;
+}
