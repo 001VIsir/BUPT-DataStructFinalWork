@@ -1,0 +1,48 @@
+以下是针对`Place`结构体和相关函数的开发者文档：
+Place 结构体
+`Place`结构体用于存储地点的信息，包括以下字段：
+- `id`: 地点的唯一标识符。
+- `name`: 地点的名称。
+- `type`: 地点的类型。
+- `popularity`: 地点的人气指数。
+- `score`: 地点的评分。
+## 函数文档
+### readPlacesFromFile
+bool readPlacesFromFile(const std::string& filename, Place places[], int& placeCount, int maxPlaces);
+从CSV文件中读取地点数据，并将数据存储在`places`数组中。
+**参数**：
+- `filename`: 包含地点数据的CSV文件的名称。
+- `places`: 用于存储读取的地点数据的数组。
+- `placeCount`: 引用变量，用于存储读取的地点数量。
+- `maxPlaces`: 数组`places`的最大容量。
+**返回值**：
+- 如果文件成功打开并读取，返回`true`。否则，返回`false`。
+
+### printPlaces
+void printPlaces(const Place places[], int placeCount);
+打印`places`数组中存储的地点数据。
+**参数**：
+- `places`: 包含地点数据的数组。
+- `placeCount`: 数组中地点的数量。
+
+### swap
+void swap(Place* a, Place* b);
+交换两个`Place`对象的值。
+**参数**：
+- `a`: 指向第一个`Place`对象的指针。
+- `b`: 指向第二个`Place`对象的指针。
+
+# quickSort 函数
+void quickSort(Place arr[], int low, int high, SortField sortField);
+使用快速排序算法对`arr`数组中的地点数据进行排序。
+**参数**：
+- `arr`: 包含地点数据的数组。
+- `low`: 排序的起始索引。
+- `high`: 排序的结束索引。
+- `sortField`: 指定排序的字段，可以是`SortField::Popularity`或`SortField::Score`。
+
+**行为**：
+- 根据`sortField`指定的字段对`arr`数组中从索引`low`到`high`的元素进行排序。
+- 如果`sortField`是`SortField::Popularity`，则按照`popularity`字段降序排序。
+- 如果`sortField`是`SortField::Score`，则按照`score`字段降序排序。
+
