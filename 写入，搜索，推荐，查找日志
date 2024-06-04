@@ -1,0 +1,238 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+
+struct Journal {
+    string name;
+    string content;
+    int views;
+    double rating;
+    int ratingsCount;
+    string destination;
+};
+
+vector<Journal> journals;
+
+void loadJournals(const string& filePath) {
+    ifstream file(filePath);
+    if (!file) {
+        cerr << "Error opening file: " << filePath << endl;
+        return;
+    }
+
+    string line;
+    Journal journal;
+    while (getline(file, line)) {
+        if (line == "JOURNAL") {
+            if (!journal.name.empty()) {
+                journals.push_back(journal);
+            }
+            journal = Journal();
+        }
+        else if (line.substr(0, 5) == "NAME:") {
+            journal.name = line.substr(5);
+        }
+        else if (line.substr(0, 8) == "CONTENT:") {
+            journal.content = line.substr(8);
+        }
+        else if (line.substr(0, 6) == "VIEWS:") {
+            journal.views = stoi(line.substr(6));
+        }
+        else if (line.substr(0, 7) == "RATING:") {
+            journal.rating = stod(line.substr(7));
+        }
+        else if (line.substr(0, 13) == "RATINGS_COUNT:") {
+            journal.ratingsCount = stoi(line.substr(13));
+        }
+        else if (line.substr(0, 11) == "DESTINATION:") {
+            journal.destination = line.substr(11);
+        }
+    }
+    if (!journal.name.empty()) {
+        journals.push_back(journal);
+    }
+    file.close();
+}
+
+void saveJournals(const string& filePath) {
+    ofstream file(filePath);
+    if (!file) {
+        cerr << "Error opening file: " << filePath << endl;
+        return;
+    }
+
+    for (const auto& journal : journals) {
+        file << "JOURNAL\n";
+        file << "NAME:" << journal.name << "\n";
+        file << "CONTENT:" << journal.content << "\n";
+        file << "VIEWS:" << journal.views << "\n";
+        file << "RATING:" << journal.rating << "\n";
+        file << "RATINGS_COUNT:" << journal.ratingsCount << "\n";
+        file << "DESTINATION:" << journal.destination << "\n";
+    }
+    file.close();
+}
+
+void displayJournalCount() {
+    cout << "Number of journals: " << journals.size() << endl;
+}
+
+void browseAndQueryJournals() {
+    string query;
+    cout << "Enter journal name to search (or leave blank to browse all): ";
+    getline(cin, query);
+
+    for (const auto& journal : journals) {
+        if (query.empty() || journal.name == query) {
+            cout << "Name: " << journal.name << endl;
+            cout << "Content: " << journal.content << endl;
+            cout << "Views: " << journal.views << endl;
+            cout << "Rating: " << journal.rating << endl;
+            cout << "Destination: " << journal.destination << endl;
+            cout << endl;
+        }
+    }
+}
+
+void rateJournal() {
+    string journalName;
+    double rating;
+    cout << "Enter the name of the journal to rate: ";
+    getline(cin, journalName);
+
+    auto it = find_if(journals.begin(), journals.end(), [&](const Journal& j) {
+        return j.name == journalName;
+        });
+
+    if (it != journals.end()) {
+        cout << "Enter your rating (1-5): ";
+        cin >> rating;
+        cin.ignore(); // 忽略输入缓冲区的换行符
+
+        it->rating = (it->rating * it->ratingsCount + rating) / (it->ratingsCount + 1);
+        it->ratingsCount++;
+        cout << "Journal rated successfully." << endl;
+    }
+    else {
+        cout << "Journal not found." << endl;
+    }
+}
+
+void recommendJournals() {
+    // 按照热度和评分进行推荐
+    vector<Journal> sortedJournals = journals;
+    sort(sortedJournals.begin(), sortedJournals.end(), [](const Journal& a, const Journal& b) {
+        if (a.views != b.views) {
+            return a.views > b.views;
+        }
+        else {
+            return a.rating > b.rating;
+        }
+        });
+
+    cout << "Recommended journals:" << endl;
+    for (const auto& journal : sortedJournals) {
+        cout << "Name: " << journal.name << endl;
+        cout << "Views: " << journal.views << endl;
+        cout << "Rating: " << journal.rating << endl;
+        cout << endl;
+    }
+}
+
+void sortJournalsByDestination() {
+    string destination;
+    cout << "Enter destination to sort by: ";
+    getline(cin, destination);
+
+    vector<Journal> destinationJournals;
+    for (const auto& journal : journals) {
+        if (journal.destination == destination) {
+            destinationJournals.push_back(journal);
+        }
+    }
+
+    sort(destinationJournals.begin(), destinationJournals.end(), [](const Journal& a, const Journal& b) {
+        if (a.views != b.views) {
+            return a.views > b.views;
+        }
+        else {
+            return a.rating > b.rating;
+        }
+        });
+
+    cout << "Journals sorted by destination:" << endl;
+    for (const auto& journal : destinationJournals) {
+        cout << "Name: " << journal.name << endl;
+        cout << "Views: " << journal.views << endl;
+        cout << "Rating: " << journal.rating << endl;
+        cout << endl;
+    }
+}
+
+void searchJournalsByContent() {
+    string searchTerm;
+    cout << "Enter search term: ";
+    getline(cin, searchTerm);
+
+    for (const auto& journal : journals) {
+        if (journal.content.find(searchTerm) != string::npos) {
+            cout << "Name: " << journal.name << endl;
+            cout << "Content: " << journal.content << endl;
+            cout << endl;
+        }
+    }
+}
+
+void saveJournalToFile(const Journal& journal, const string& filePath) {
+    ofstream file(filePath, ios::app); // 以追加模式打开文件
+    if (file.is_open()) {
+        file << "Name: " << journal.name << endl;
+        file << "Content: " << journal.content << endl;
+        file << "Views: " << journal.views << endl;
+        file << "Rating: " << journal.rating << endl;
+        file << "Ratings Count: " << journal.ratingsCount << endl;
+        file << "Destination: " << journal.destination << endl;
+        file << "-------------------------" << endl; // 添加分割线
+        file.close();
+        cout << "Journal saved to " << filePath << endl;
+    }
+    else {
+        cerr << "Unable to open file for writing." << endl;
+    }
+}
+
+int main() {
+    const string filePath = "journals.txt";
+    Journal journal;
+    cout << "Enter journal name: ";
+    getline(cin, journal.name);
+    cout << "Enter journal content: ";
+    getline(cin, journal.content);
+    cout << "Enter journal 浏览量: ";
+    cin >> journal.views;
+    cin.ignore(); // 忽略输入缓冲区的换行符
+    cout << "Enter journal 评分: ";
+    cin >> journal.rating;
+    cin.ignore(); // 忽略输入缓冲区的换行符
+    cout << "Enter journal 评价数: ";
+    cin >> journal.ratingsCount;
+    cin.ignore(); // 忽略输入缓冲区的换行符
+    cout << "Enter journal 路径: ";
+    getline(cin, journal.destination);
+    // 保存日记到文件
+    return 0;
+}
