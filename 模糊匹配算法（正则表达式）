@@ -1,0 +1,40 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <regex>
+#include <vector>
+
+std::vector<std::pair<std::string, int>> fuzzySearchInFile(const std::string& query, const std::string& filePath) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filePath << std::endl;
+        return {};
+    }
+
+    std::regex pattern(query); // 创建正则表达式模式
+    std::string line;
+    int lineNumber = 0;
+    std::vector<std::pair<std::string, int>> results;
+
+    while (std::getline(file, line)) {
+        ++lineNumber;
+        if (std::regex_search(line, pattern)) {
+            results.push_back(std::make_pair(line, lineNumber));
+        }
+    }
+
+    file.close();
+    return results;
+}
+
+int main() {
+    std::string query = "app.*"; // 使用正则表达式进行模糊匹配
+    std::string filePath = "text.txt"; // 替换为你的文件路径
+    std::vector<std::pair<std::string, int>> results = fuzzySearchInFile(query, filePath);
+
+    for (const auto& result : results) {
+        std::cout << "Line: " << result.second << ", Text: " << result.first << std::endl;
+    }
+
+    return 0;
+}
