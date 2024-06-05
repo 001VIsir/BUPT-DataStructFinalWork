@@ -1,0 +1,27 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import networkx as nx
+
+# 设置支持中文的字体，例如SimHei
+plt.rcParams['font.sans-serif'] = ['SimHei']  
+plt.rcParams['axes.unicode_minus'] = False  
+# 读取CSV文件
+data = pd.read_csv('neibupaths.csv', encoding='GB2312')
+# 确保数据正确读取
+print(data.head())
+# 创建一个空的无向图
+G = nx.Graph()
+# 添加节点和边
+for index, row in data.iterrows():
+    node1 = row['地点1']
+    node2 = row['地点2']
+    distance = row['路径距离']
+    G.add_edge(node1, node2, weight=distance)
+# 绘制图形
+pos = nx.kamada_kawai_layout(G)  # 使用kamada_kawai布局算法
+nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=500, font_weight='bold')
+# 绘制边的权重
+edge_labels = {(i, j): G[i][j]['weight'] for i, j in G.edges()}
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+# 显示图表
+plt.show()
