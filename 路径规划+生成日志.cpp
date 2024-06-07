@@ -40,49 +40,86 @@
         adjList[p2.id].push_back(edge2);
     }
 
-    // 输入地点名称
-    string pointName1, pointName2;
+    // 输入当前位置名称
+    string startPointName;
     cout << "Enter the name of the starting point: ";
-    cin >> pointName1;
-    if (points.find(pointName1) == points.end()) {
-        cerr << "Error: Starting point '" << pointName1 << "' does not exist." << endl;
-        return;
+    cin >> startPointName;
+    if (points.find(startPointName) == points.end()) {
+        cerr << "Error: Starting point '" << startPointName << "' does not exist." << endl;
+        return ;
     }
 
-    cout << "Enter the name of the destination point: ";
-    cin >> pointName2;
-    if (points.find(pointName2) == points.end()) {
-        cerr << "Error: Destination point '" << pointName2 << "' does not exist." << endl;
-        return;
+    int strategy;
+    // 输入多个目标地点名称
+    vector<string> targetPoints;
+    string targetPointName;
+    cout << "Enter the names of the target points (enter 'done' to finish): ";
+    while (cin >> targetPointName && targetPointName != "done") {
+        if (points.find(targetPointName) == points.end()) {
+            cerr << "Error: Target point '" << targetPointName << "' does not exist." << endl;
+            return ;
+        }
+        targetPoints.push_back(targetPointName);
     }
 
     // 输入路线策略
-    int strategy;
     cout << "Enter 0 for shortest path strategy or 1 for shortest time strategy: ";
     cin >> strategy;
     if (strategy != 0 && strategy != 1) {
         cerr << "Error: Invalid strategy. Enter 0 for shortest path or 1 for shortest time." << endl;
-        return;
+        return ;
     }
 
-    // 根据选择的策略找出路径
-    vector<Edge> path = dijkstra(adjList, points, pointName1, pointName2, strategy == 1);
-    cout << (strategy == 0 ? "Shortest path" : "Fastest path") << " from " << pointName1 << " to " << pointName2 << ":" << endl;
+    // 规划最优游学路线
+    vector<Edge> finalPath;
+    string currentPoint = startPointName;
+    double totalDistance = 0.0;
+    while (!targetPoints.empty()) {
+        double minDistance = numeric_limits<double>::max();
+        string nextPoint;
+        vector<Edge> shortestPath;
 
+        for (const string& target : targetPoints) {
+            vector<Edge> path = dijkstra(adjList, points, currentPoint, target, strategy == 1);
+            double pathDistance = path.back().distance;
+            if (pathDistance < minDistance) {
+                minDistance = pathDistance;
+                nextPoint = target;
+                shortestPath = path;
+            }
+        }
+
+        if (!shortestPath.empty()) {
+            finalPath.insert(finalPath.end(), shortestPath.begin() + 1, shortestPath.end());
+            totalDistance += minDistance;
+            currentPoint = nextPoint;
+            targetPoints.erase(remove(targetPoints.begin(), targetPoints.end(), nextPoint), targetPoints.end());
+        }
+    }
+
+    // 输出最终的游学路线
+    cout << (strategy == 0 ? "Shortest path" : "Fastest path") << " for the tour:" << endl;
     stringstream pathStream;
-    for (const auto& edge : path) {
-        cout << edge.dest.name << " (" << (strategy == 0 ? "distance: " : "time: ") << edge.distance << ")" << endl;
-        pathStream << edge.dest.name << " (" << (strategy == 0 ? "distance: " : "time: ") << edge.distance << "), ";
+    for (size_t i = 0; i < finalPath.size(); ++i) {
+        cout << finalPath[i].dest.name << " (" << (strategy == 0 ? "distance: " : "time: ") << finalPath[i].distance << ")" << endl;
+        pathStream << finalPath[i].dest.name << " (" << (strategy == 0 ? "distance: " : "time: ") << finalPath[i].distance << ")";
+        if (i != finalPath.size() - 1) {
+            pathStream << " -> ";
+        }
     }
+    cout << "Total " << (strategy == 0 ? "distance: " : "time: ") << totalDistance << endl;
 
     // 创建日志并保存
     Journal journal;
-    journal.name = "Path from " + pointName1 + " to " + pointName2;
-    journal.content = pathStream.str();
+    journal.name = startPointName; // 修改日志名称为起始地点
+    journal.content = "Route: " + startPointName + " -> " + pathStream.str();
     journal.views = 0;
     journal.rating = 0.0;
     journal.ratingsCount = 0;
-    journal.destination = pointName2;
+
+    // 设置日志的目的地为所有目标地点的字符串表示形式
+    journal.destination = pathStream.str();
+
     journals.push_back(journal);
 
     saveJournals("journals.txt");
