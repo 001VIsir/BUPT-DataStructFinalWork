@@ -19,11 +19,8 @@ MainWindow::~MainWindow()
 }
 
 // 添加一个槽函数，用于显示登录窗口
-
-
 void MainWindow::on_beginButton_clicked()
 {
-
     loginWindow = new loginwindow;
     loginWindow->loadUsersFromCSV();
     loginWindow->show(); // 显示登录窗口

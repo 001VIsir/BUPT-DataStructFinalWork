@@ -26,3 +26,18 @@ void feature_list::on_quit_clicked()
     close();
 }
 
+
+void feature_list::on_insideSearch_clicked()
+{
+    insideSearch = new insidesearch();
+//    insideSearch->readinsidePlacesFromFile();
+    insideSearch->show();
+}
+
+
+void feature_list::on_daohang_clicked()
+{
+    naviGate = new navigate();
+    naviGate->show();
+}
+

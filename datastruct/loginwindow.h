@@ -35,9 +35,10 @@ public:
     explicit loginwindow(QWidget *parent = nullptr);
     ~loginwindow();
     void addUser(int account, QString password, QString name);
-    User* users[TABLE_SIZE]; // 哈希表，初始化为null
+    User* users[TABLE_SIZE] = {nullptr}; // 哈希表，初始化为null
     void loadUsersFromCSV();
     static int hashFunction(int id);
+    void printf_hash();
 private slots:
 
     void loginUser();

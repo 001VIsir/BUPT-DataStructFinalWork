@@ -7,7 +7,6 @@ loginwindow::loginwindow(QWidget *parent) :
     ui(new Ui::loginwindow) // 创建由Qt Designer生成的界面对象
 {
     ui->setupUi(this); // 设置界面
-
     // 连接登录按钮的clicked信号到loginwindow类的loginUser槽函数
     connect(ui->loginButton, &QPushButton::clicked, this, &loginwindow::loginUser);
 }
@@ -27,23 +26,28 @@ void loginwindow::addUser(int account, QString password, QString name) {
     int index = hashFunction(account); // 计算哈希索引
     xinlaide->next = users[index]; // 设置链表的下一个节点
     users[index] = xinlaide; // 将新用户添加到链表头部
+//    QDebug debug = qDebug();
+//    debug << index;
 }
 
 // loginUser函数是登录按钮的槽函数
 void loginwindow::loginUser()
 {
+    printf_hash();
     // 从QLineEdit控件中获取用户输入的账号和密码
     int id = ui->input_account->text().toInt();
     QString password = ui->input_password->text();
 
     // 计算账号的哈希索引
     int index = hashFunction(id);
-    // 遍历链表查找匹配的用户
+    // 遍历查找匹配的用户
     for (User* user = users[index]; user != nullptr; user = user->next) {
         if (user->password == password) {
             // 如果密码匹配，则登录成功
             loggedInUser = id;
-
+            QDebug debug = qDebug();
+            debug << users[index];
+            debug << user->password;
             // 创建并显示新窗口feature_list
             feature_List = new feature_list();
             feature_List->show();
@@ -55,6 +59,16 @@ void loginwindow::loginUser()
     QMessageBox::warning(this, "Login", "登录失败");
 }
 
+void loginwindow::printf_hash(){
+    for (User* user = users[23]; user != nullptr; user = user->next) {
+            QDebug debug = qDebug();
+            debug << user->password;
+            // 创建并显示新窗口feature_list
+            // this->close(); // 注释掉的代码，用于关闭当前窗口
+            return;
+
+    }
+}
 // loadUsersFromCSV函数用于从CSV文件中加载用户数据
 void loginwindow::loadUsersFromCSV() {
     // close(); // 注释掉的代码，用于关闭当前窗口
@@ -80,7 +94,10 @@ void loginwindow::loadUsersFromCSV() {
         newUser->account = account; // 设置账号
         newUser->password = password; // 设置密码
         newUser->name = name; // 设置姓名
-
+//        QDebug debug = qDebug();
+//        debug << newUser->account;
+//        debug << newUser->password;
+//        debug << newUser->name;
         // 计算哈希索引并添加新用户到链表
         int index = hashFunction(account);
         newUser->next = users[index];

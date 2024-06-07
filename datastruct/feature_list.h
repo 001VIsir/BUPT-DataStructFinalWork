@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <searchplace.h>
+#include <insidesearch.h>
+#include <navigate.h>
 namespace Ui {
 class feature_list;
 }
@@ -20,10 +22,15 @@ private slots:
 
     void on_quit_clicked();
 
+    void on_insideSearch_clicked();
+
+    void on_daohang_clicked();
+
 private:
     Ui::feature_list *ui;
         searchplace *searchPlace;
-
+        insidesearch *insideSearch;
+        navigate *naviGate;
 };
 
 #endif // FEATURE_LIST_H

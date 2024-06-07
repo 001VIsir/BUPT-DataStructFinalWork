@@ -23,10 +23,14 @@ void logup::on_confirm_clicked()
     xinlaide->account = account;
     xinlaide->password = password;
     xinlaide->name = name;
-    int index = loginwindow::hashFunction(account);
-
     loginwindow *loginWindow;
-    loginWindow->addUser(account, password, name); // 传递 loginwindow 类的实例来访问 users 数组
+    int index = loginwindow::hashFunction(account);
+    xinlaide->next = loginWindow->users[index]; // 设置链表的下一个节点
+    loginWindow->users[index] = xinlaide; // 将新用户添加到链表头部
+    QDebug debug = qDebug();
+    debug << index;
+
+//    loginWindow->addUser(account, password, name); // 传递 loginwindow 类的实例来访问 users 数组
 
     QMessageBox::warning(this, "logup","注册成功");
 

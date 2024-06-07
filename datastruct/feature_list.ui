@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="text">
-    <string>查询景点</string>
+    <string>景点推荐</string>
    </property>
   </widget>
   <widget class="QPushButton" name="dairy">
@@ -67,7 +67,7 @@
     <string>退出</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="tuijian">
+  <widget class="QPushButton" name="insideSearch">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -82,7 +82,7 @@
     </font>
    </property>
    <property name="text">
-    <string>景点推荐</string>
+    <string>场所查询</string>
    </property>
   </widget>
   <widget class="QPushButton" name="daohang">
