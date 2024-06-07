@@ -23,22 +23,89 @@ struct Edge {
 
 double idealSpeed = 5.0;  // 理想速度
 
-// Dijkstra算法
+// 最小堆的实现
+class MinHeap {
+private:
+    vector<pair<double, int>> heap;
+    int size;
+
+    int parent(int i) {
+        return (i - 1) / 2;
+    }
+
+    int left(int i) {
+        return 2 * i + 1;
+    }
+
+    int right(int i) {
+        return 2 * i + 2;
+    }
+
+    void heapifyDown(int i) {
+        int minIndex = i;
+        int l = left(i);
+        int r = right(i);
+        if (l < size && heap[l].first < heap[minIndex].first) {
+            minIndex = l;
+        }
+        if (r < size && heap[r].first < heap[minIndex].first) {
+            minIndex = r;
+        }
+        if (minIndex != i) {
+            swap(heap[i], heap[minIndex]);
+            heapifyDown(minIndex);
+        }
+    }
+
+    void heapifyUp(int i) {
+        while (i > 0 && heap[parent(i)].first > heap[i].first) {
+            swap(heap[i], heap[parent(i)]);
+            i = parent(i);
+        }
+    }
+
+public:
+    MinHeap() {
+        size = 0;
+    }
+
+    void push(pair<double, int> value) {
+        heap.push_back(value);
+        size++;
+        heapifyUp(size - 1);
+    }
+
+    pair<double, int> pop() {
+        if (size == 0) {
+            return make_pair(numeric_limits<double>::max(), -1);
+        }
+        pair<double, int> root = heap[0];
+        heap[0] = heap[size - 1];
+        size--;
+        heapifyDown(0);
+        return root;
+    }
+
+    bool empty() {
+        return size == 0;
+    }
+};
+
+// Dijkstra算法实现
 vector<Edge> dijkstra(const vector<vector<Edge>>& adjList, const map<string, Point>& points, const string& startPointName, const string& endPointName, bool useTime) {
     int src = points.at(startPointName).id; // 起始点的编号
     int dest = points.at(endPointName).id; // 目标点的编号
     int n = adjList.size(); // 图中节点的数量
     vector<double> dist(n, numeric_limits<double>::max()); // 从起始点到各节点的距离/时间
     vector<int> prev(n, -1); // 最短路径的前驱节点
-    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq; // 最小堆用于Dijkstra算法
+    MinHeap pq; // 最小堆用于Dijkstra算法
 
     dist[src] = 0; // 起始点到自身的距离为0
     pq.push({ 0, src }); // 将起始点加入优先队列
 
     // Dijkstra算法核心部分
     while (!pq.empty()) {
-        int u = pq.top().second; // 获取当前距离起始点最近的节点
-        pq.pop();
+        int u = pq.pop().second; // 获取当前距离起始点最近的节点
 
         // 遍历当前节点的所有邻居
         for (const auto& edge : adjList[u]) {
