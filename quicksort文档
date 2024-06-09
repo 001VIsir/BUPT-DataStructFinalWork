@@ -1,48 +1,84 @@
-以下是针对`Place`结构体和相关函数的开发者文档：
+地点数据排序系统开发文档
+
+本项目实现了一个用于读取、存储和排序地点数据的系统。地点数据从CSV文件中读取，包括地点的ID、名称、类型、受欢迎程度和评分。然后，系统可以根据受欢迎程度或评分对这些地点进行快速排序，并将结果打印输出。
+
+文件结构
+places.csv：存储地点数据的CSV文件。
+程序功能
+
+从CSV文件中读取地点数据并存储在数组中。
+提供根据受欢迎程度和评分对地点数据进行快速排序的功能。将排序后的数据输出到控制台。
+数据结构
 Place 结构体
-`Place`结构体用于存储地点的信息，包括以下字段：
-- `id`: 地点的唯一标识符。
-- `name`: 地点的名称。
-- `type`: 地点的类型。
-- `popularity`: 地点的人气指数。
-- `score`: 地点的评分。
-## 函数文档
-### readPlacesFromFile
-bool readPlacesFromFile(const std::string& filename, Place places[], int& placeCount, int maxPlaces);
-从CSV文件中读取地点数据，并将数据存储在`places`数组中。
-**参数**：
-- `filename`: 包含地点数据的CSV文件的名称。
-- `places`: 用于存储读取的地点数据的数组。
-- `placeCount`: 引用变量，用于存储读取的地点数量。
-- `maxPlaces`: 数组`places`的最大容量。
-**返回值**：
-- 如果文件成功打开并读取，返回`true`。否则，返回`false`。
+struct Place {
+    int id;
+    std::string name;
+    std::string type;
+    int popularity;
+    double score;
+}
+id：地点的唯一标识符。
+name：地点名称。
+type：地点类型。
+popularity：地点的受欢迎程度。
+score：地点评分。
+SortField 枚举类型
+enum class SortField {
+    Popularity,
+    Score
+};
+Popularity：按受欢迎程度排序。
+Score：按评分排序。
 
-### printPlaces
-void printPlaces(const Place places[], int placeCount);
-打印`places`数组中存储的地点数据。
-**参数**：
-- `places`: 包含地点数据的数组。
-- `placeCount`: 数组中地点的数量。
+swap(Place* a, Place* b)`
+交换两个`Place`对象的位置。
+参数：
+a：指向第一个`Place`对象的指针。
+b：指向第二个`Place`对象的指针。
+返回值：无
 
-### swap
-void swap(Place* a, Place* b);
-交换两个`Place`对象的值。
-**参数**：
-- `a`: 指向第一个`Place`对象的指针。
-- `b`: 指向第二个`Place`对象的指针。
+int partition(Place arr[], int low, int high, SortField sortField)`
 
-# quickSort 函数
-void quickSort(Place arr[], int low, int high, SortField sortField);
-使用快速排序算法对`arr`数组中的地点数据进行排序。
-**参数**：
-- `arr`: 包含地点数据的数组。
-- `low`: 排序的起始索引。
-- `high`: 排序的结束索引。
-- `sortField`: 指定排序的字段，可以是`SortField::Popularity`或`SortField::Score`。
+进行快速排序的分区操作，根据指定字段对数组进行划分。
 
-**行为**：
-- 根据`sortField`指定的字段对`arr`数组中从索引`low`到`high`的元素进行排序。
-- 如果`sortField`是`SortField::Popularity`，则按照`popularity`字段降序排序。
-- 如果`sortField`是`SortField::Score`，则按照`score`字段降序排序。
+参数：
+arr：待排序的`Place`数组。
+low：数组的起始索引。
+high：数组的结束索引。
+sortField：指定的排序字段。
+返回值：分区索引
+void quickSort(Place arr[], int low, int high, SortField sortField)`
 
+快速排序算法的实现，对数组进行递归排序。
+参数：
+arr：待排序的`Place`数组。
+low：数组的起始索引。
+high：数组的结束索引。
+sortField：指定的排序字段。
+返回值：无
+
+bool readPlacesFromFile(const std::string& filename, Place places[], int& placeCount, int maxPlaces)
+从CSV文件中读取地点数据并存储在数组中。
+参数：
+filename：CSV文件名。
+places：存储读取数据的`Place`数组。
+placeCount：已读取的地点数量。
+maxPlaces：最大可读取的地点数量。
+返回值：布尔值，表示是否成功读取数据。
+void printPlaces(const Place places[], int placeCount)
+
+打印地点数据到控制台。
+参数：
+places：存储地点数据的`Place`数组。
+placeCount：地点数量。
+返回值：无
+
+步骤：
+1. 定义最大可读取地点数量`MAX_PLACES`。
+2. 声明`places`数组用于存储地点数据。
+3. 初始化`placeCount`为0。
+4. 从文件`places.csv`中读取地点数据。
+5. 如果成功读取数据：
+   - 按`popularity`字段对地点数据进行快速排序并打印结果。
+   - 按`score`字段对地点数据进行快速排序并打印结果。
+6. 如果读取数据失败，打印错误信息。
