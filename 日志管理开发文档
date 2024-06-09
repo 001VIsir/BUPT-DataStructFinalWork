@@ -1,0 +1,135 @@
+日记管理系统开发文档
+
+简介
+
+本项目实现了一个简单的日记管理系统。该系统能够加载、保存、浏览、查询、推荐、排序和搜索日记。日记数据从文本文件中读取，并存储在内存中进行操作。
+
+文件结构
+
+main.cpp：主程序文件，包含所有实现代码。
+journals.txt：存储日记数据的文本文件。
+
+数据结构
+struct Journal {
+    string name;
+    string content;
+    int views;
+    double rating;
+    int ratingsCount;
+    string destination;
+};
+
+name：日记名称。
+content：日记内容。
+views：浏览量。
+rating：评分。
+ratingsCount：评分数量。
+destination：目的地。
+
+void loadJournals(const string& filePath)`
+从指定文件加载日记数据到内存中。
+参数：
+filePath：包含日记数据的文件路径。
+
+返回值：无
+
+功能：
+打开文件并读取内容。
+解析文件内容并将日记数据存储到`journals`向量中。
+
+void saveJournals(const string& filePath)
+
+将内存中的日记数据保存到指定文件。
+
+参数：
+filePath：要保存日记数据的文件路径。
+
+返回值：无
+
+功能：
+打开文件并写入日记数据。
+每个日记之间使用"JOURNAL"分隔符。
+
+void displayJournalCount()
+显示当前加载的日记数量。
+参数：无
+返回值：无
+功能：
+输出当前加载的日记数量。
+
+void browseAndQueryJournals()
+浏览和查询日记。
+参数：无
+返回值：无
+功能：
+用户输入要查询的日记名称，或留空浏览所有日记。
+输出匹配的日记信息。
+
+void rateJournal()`
+对指定日记进行评分。
+
+参数：无
+返回值：无
+功能：
+用户输入日记名称和评分。
+更新日记的评分和评分数量。
+
+void recommendJournals()`
+推荐日记。
+参数：无
+返回值：无
+功能：
+按浏览量和评分排序日记。
+输出推荐的日记信息。
+
+void sortJournalsByDestination()`
+按目的地排序日记。
+参数：无
+返回值：无
+功能：
+用户输入目的地。
+输出按浏览量和评分排序的匹配目的地的日记信息。
+
+void searchJournalsByContent()
+根据内容搜索日记。
+参数：无
+返回值：无
+功能：
+用户输入搜索词。
+输出包含搜索词的日记信息。
+
+void saveJournalToFile(const Journal& journal, const string& filePath)
+将单个日记保存到文件。
+
+参数：
+journal：要保存的日记。
+filePath：要保存的文件路径。
+返回值：无
+
+功能：
+将指定日记附加保存到文件。
+
+功能：程序入口函数，用户交互输入日记信息并调用相关函数进行处理。
+
+步骤：
+1. 定义文件路径filePath为"journals.txt"。
+2. 通过用户输入创建新的`Journal`对象。
+3. 调用saveJournalToFile函数将日记保存到文件。
+
+journals.txt 文件格式示例如下：
+JOURNAL
+NAME:Journal1
+CONTENT:This is the content of journal 1.
+VIEWS:100
+RATING:4.5
+RATINGS_COUNT:10
+DESTINATION:Destination1
+JOURNAL
+NAME:Journal2
+CONTENT:This is the content of journal 2.
+VIEWS:150
+RATING:4.7
+RATINGS_COUNT:15
+DESTINATION:Destination2
+
+
