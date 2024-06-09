@@ -6,15 +6,7 @@
 #include <queue>
 #include <unordered_map>
 #include <algorithm>
-
 using namespace std;
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <queue>
-#include <unordered_map>
 
 struct Journal {
     string name;
